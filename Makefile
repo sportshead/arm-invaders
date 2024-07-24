@@ -1,29 +1,21 @@
-CC = arm-none-eabi-gcc
-CFLAGS = -mcpu=cortex-a7 -fpic -ffreestanding -std=gnu99 -O2 -Wall -Wextra
-ASFLAGS = -mcpu=cortex-a7 -fpic -ffreestanding
-LDFLAGS = -T linker.ld -ffreestanding -O2 -nostdlib -lgcc
+SRCS = $(wildcard *.c)
+OBJS = $(SRCS:.c=.o)
+CFLAGS = -Wall -O2 -ffreestanding -nostdinc -nostdlib -mcpu=cortex-a53+nosimd
 
-OBJS = boot.o kernel.o
-EXEC = kernel.elf
-IMAGE = kernel7.img
+all: clean kernel8.img
 
-# Targets
-all: $(IMAGE)
+start.o: start.S
+	clang --target=aarch64-elf $(CFLAGS) -c start.S -o start.o
 
-boot.o: boot.S
-	$(CC) $(ASFLAGS) -c boot.S -o boot.o
+%.o: %.c
+	clang --target=aarch64-elf $(CFLAGS) -c $< -o $@
 
-kernel.o: kernel.c
-	$(CC) $(CFLAGS) -c kernel.c -o kernel.o
-
-$(EXEC): $(OBJS)
-	$(CC) $(LDFLAGS) -o $(EXEC) $(OBJS)
-
-$(IMAGE): $(EXEC)
-	arm-none-eabi-objcopy $(EXEC) -O binary $(IMAGE)
+kernel8.img: start.o $(OBJS)
+	ld.lld -m aarch64elf -nostdlib start.o $(OBJS) -T link.ld -o kernel8.elf
+	llvm-objcopy -O binary kernel8.elf kernel8.img
 
 clean:
-	rm -f $(OBJS) $(EXEC) $(IMAGE)
+	rm kernel8.elf *.o >/dev/null 2>/dev/null || true
 
-run: $(IMAGE)
-	qemu-system-arm -M raspi2b -serial stdio -kernel $(IMAGE)
+run: kernel8.img
+	qemu-system-aarch64 -M raspi3b -kernel kernel8.img -serial mon:stdio
