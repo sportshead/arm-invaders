@@ -82,7 +82,6 @@ void lfb_showpicture() {
   ptr += (height - flyer_height) / 2 * pitch + (width - flyer_width) * 2;
   for (y = 0; y < flyer_height; y++) {
     for (x = 0; x < flyer_width; x++) {
-      uart_puts("inner loop");
       HEADER_PIXEL(data, pixel);
       // the image is in RGB. So if we have an RGB framebuffer, we can copy the
       // pixels directly, but for BGR we must swap R (pixel[0]) and B (pixel[2])
