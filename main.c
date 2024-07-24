@@ -8,6 +8,9 @@ void main() {
 
   lfb_print(0, 0, "HELLO WORLD?", 0xff, 0xff, 0xff);
 
+  lfb_print(0, 8, "ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789 <>=*?-", 0xff, 0xff,
+            0xff);
+
   // echo everything back
   while (1) {
     uart_send(uart_getc());
