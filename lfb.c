@@ -1,4 +1,5 @@
 #include "delays.h"
+#include "font.h"
 #include "mbox.h"
 #include "uart.h"
 
@@ -67,5 +68,84 @@ void lfb_init() {
     lfb = (void *)((unsigned long)mbox[28]);
   } else {
     uart_puts("Unable to set screen resolution to 1024x768x32\n");
+  }
+}
+
+void draw_glyph(int x, int y, char (*glyph)[8], const char R, const char G,
+                const char B) {
+  int i, j;
+  for (i = 0; i < 8; i++) {
+    int offset = (y + i) * pitch + (x * 4);
+    for (j = 0; j < 8; j++) {
+      if ((*glyph)[i] & (0b10000000 >> j)) {
+        lfb[offset++] = R;
+        lfb[offset++] = G;
+        lfb[offset++] = B;
+      } else {
+        lfb[offset++] = 0;
+        lfb[offset++] = 0;
+        lfb[offset++] = 0;
+      }
+    }
+  }
+}
+
+/**
+ * Display a string using the embedded bitmap font
+ */
+void lfb_print(const int X, const int Y, char *s, const char R, const char G,
+               const char B) {
+  int x, y = 0;
+  while (*s) {
+    char(*glyph)[8] = 0x0;
+    if (*s >= 'A' && *s <= 'Z') {
+      glyph = &font_chars[*s - 'A'];
+    } else if (*s >= '0' && *s <= '9') {
+      glyph = &font_chars[*s - '0' + 26];
+    } else if (*s >= '<' && *s <= '?') {
+      glyph = &font_chars[*s - '<' + 36];
+    } else if (*s == '*') {
+      glyph = &font_chars[40];
+    } else if (*s == '-') {
+      glyph = &font_chars[41];
+    } else if (*s == '\r') {
+      x = 0;
+    } else if (*s == '\n') {
+      x = 0;
+      y += 8;
+    } else if (*s != ' ') {
+      uart_puts("Unknown character: ");
+      uart_hex(*s);
+      uart_puts("\n");
+
+      // ignore error, keep going
+    }
+    if (glyph) {
+      draw_glyph(x + X, y + Y, glyph, R, G, B);
+    }
+
+    x += 8;
+
+    if (x + X >= width) {
+      x = 0;
+      y += 8;
+    }
+
+    if (y + Y >= height) {
+      uart_puts("Ran out of space! Last char printed was ");
+      uart_hex(*s);
+      uart_puts(" at addr ");
+      uart_hex((unsigned long)s >> 32);
+      uart_hex((unsigned long)s);
+      uart_puts("\nX: ");
+      uart_hex(X);
+      uart_puts(" Y: ");
+      uart_hex(Y);
+      uart_puts("\n");
+
+      return;
+    }
+
+    s++;
   }
 }
