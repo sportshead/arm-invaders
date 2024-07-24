@@ -6,10 +6,6 @@ void main() {
   uart_init();
   lfb_init();
 
-  lfb_showpicture();
-
-  uart_puts("Image displayed\n");
-
   // echo everything back
   while (1) {
     uart_send(uart_getc());

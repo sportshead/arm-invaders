@@ -1,5 +1,4 @@
 #include "delays.h"
-#include "flyer.h"
 #include "mbox.h"
 #include "uart.h"
 
@@ -19,14 +18,14 @@ void lfb_init() {
   mbox[2] = 0x48003; // set phy wh
   mbox[3] = 8;
   mbox[4] = 8;
-  mbox[5] = 1024; // FrameBufferInfo.width
-  mbox[6] = 768;  // FrameBufferInfo.height
+  mbox[5] = 224; // FrameBufferInfo.width
+  mbox[6] = 256; // FrameBufferInfo.height
 
   mbox[7] = 0x48004; // set virt wh
   mbox[8] = 8;
   mbox[9] = 8;
-  mbox[10] = 1024; // FrameBufferInfo.virtual_width
-  mbox[11] = 768;  // FrameBufferInfo.virtual_height
+  mbox[10] = 224; // FrameBufferInfo.virtual_width
+  mbox[11] = 256; // FrameBufferInfo.virtual_height
 
   mbox[12] = 0x48009; // set virt offset
   mbox[13] = 8;
@@ -68,29 +67,5 @@ void lfb_init() {
     lfb = (void *)((unsigned long)mbox[28]);
   } else {
     uart_puts("Unable to set screen resolution to 1024x768x32\n");
-  }
-}
-
-/**
- * Show a picture
- */
-void lfb_showpicture() {
-  int x, y;
-  unsigned char *ptr = lfb;
-  char *data = flyer_data, pixel[4];
-
-  ptr += (height - flyer_height) / 2 * pitch + (width - flyer_width) * 2;
-  for (y = 0; y < flyer_height; y++) {
-    for (x = 0; x < flyer_width; x++) {
-      HEADER_PIXEL(data, pixel);
-      // the image is in RGB. So if we have an RGB framebuffer, we can copy the
-      // pixels directly, but for BGR we must swap R (pixel[0]) and B (pixel[2])
-      // channels.
-      *((unsigned int *)ptr) =
-          isrgb ? *((unsigned int *)&pixel)
-                : (unsigned int)(pixel[0] << 16 | pixel[1] << 8 | pixel[2]);
-      ptr += 4;
-    }
-    ptr += pitch - flyer_width * 4;
   }
 }
