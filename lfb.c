@@ -71,21 +71,18 @@ void lfb_init() {
   }
 }
 
-void draw_glyph(int x, int y, char (*glyph)[8], const char R, const char G,
-                const char B) {
+#define BACKGROUND_COLOR 0x0
+void draw_glyph(int x, int y, char (*glyph)[8], const unsigned int color) {
   int i, j;
   for (i = 0; i < 8; i++) {
-    int offset = (y + i) * pitch + (x * 4);
+    int offset = (y + i) * pitch + (x * 4) + 4;
     for (j = 0; j < 8; j++) {
       if ((*glyph)[i] & (0b10000000 >> j)) {
-        lfb[offset++] = R;
-        lfb[offset++] = G;
-        lfb[offset++] = B;
+        *((unsigned int *)(lfb + offset)) = color;
       } else {
-        lfb[offset++] = 0;
-        lfb[offset++] = 0;
-        lfb[offset++] = 0;
+        *((unsigned int *)(lfb + offset)) = BACKGROUND_COLOR;
       }
+      offset += 4;
     }
   }
 }
@@ -93,8 +90,7 @@ void draw_glyph(int x, int y, char (*glyph)[8], const char R, const char G,
 /**
  * Display a string using the embedded bitmap font
  */
-void lfb_print(const int X, const int Y, char *s, const char R, const char G,
-               const char B) {
+void lfb_print(const int X, const int Y, char *s, const unsigned int color) {
   int x, y = 0;
   while (*s) {
     char(*glyph)[8] = 0x0;
@@ -121,7 +117,7 @@ void lfb_print(const int X, const int Y, char *s, const char R, const char G,
       // ignore error, keep going
     }
     if (glyph) {
-      draw_glyph(x + X, y + Y, glyph, R, G, B);
+      draw_glyph(x + X, y + Y, glyph, color);
     }
 
     x += 8;
