@@ -93,6 +93,15 @@ void draw_glyph(int x, int y, char (*glyph)[8], const unsigned int color) {
 void lfb_print(const int X, const int Y, char *s, const unsigned int color) {
   int x, y = 0;
   while (*s) {
+    if (y + Y >= height) {
+      uart_printf("Ran out of space! Last char printed was %c at 0x%16x\n", *s,
+                  s);
+      uart_printf("(X,Y) = (%d,%d)\n", X, Y);
+      uart_printf("(x,y) = (%d,%d)\n", x, y);
+
+      return;
+    }
+
     char(*glyph)[8] = 0x0;
     if (*s >= 'A' && *s <= 'Z') {
       glyph = &font_chars[*s - 'A'];
@@ -105,15 +114,12 @@ void lfb_print(const int X, const int Y, char *s, const unsigned int color) {
     } else if (*s == '-') {
       glyph = &font_chars[42];
     } else if (*s == '\r') {
-      x = 0;
+      x = -8;
     } else if (*s == '\n') {
-      x = 0;
+      x = -8;
       y += 8;
     } else if (*s != ' ') {
-      uart_puts("Unknown character: ");
-      uart_hex(*s);
-      uart_puts("\n");
-
+      uart_printf("Unknown character: %c (0x%02x)\n", *s, *s);
       // ignore error, keep going
     }
     if (glyph) {
@@ -126,22 +132,6 @@ void lfb_print(const int X, const int Y, char *s, const unsigned int color) {
       x = 0;
       y += 8;
     }
-
-    if (y + Y >= height) {
-      uart_puts("Ran out of space! Last char printed was ");
-      uart_hex(*s);
-      uart_puts(" at addr ");
-      uart_hex((unsigned long)s >> 32);
-      uart_hex((unsigned long)s);
-      uart_puts("\nX: ");
-      uart_hex(X);
-      uart_puts(" Y: ");
-      uart_hex(Y);
-      uart_puts("\n");
-
-      return;
-    }
-
     s++;
   }
 }

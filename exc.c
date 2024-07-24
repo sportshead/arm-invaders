@@ -1,4 +1,3 @@
-
 #include "uart.h"
 
 /**
@@ -94,19 +93,9 @@ void exc_handler(unsigned long type, unsigned long esr, unsigned long elr,
     }
   }
   // dump registers
-  uart_puts(":\n  ESR_EL1 ");
-  uart_hex(esr >> 32);
-  uart_hex(esr);
-  uart_puts(" ELR_EL1 ");
-  uart_hex(elr >> 32);
-  uart_hex(elr);
-  uart_puts("\n SPSR_EL1 ");
-  uart_hex(spsr >> 32);
-  uart_hex(spsr);
-  uart_puts(" FAR_EL1 ");
-  uart_hex(far >> 32);
-  uart_hex(far);
-  uart_puts("\n");
+  uart_printf(
+      ":\n ESR_EL1 %08x\n ELR_EL1 %08x\n SPSR_EL1 %08x\n FAR_EL1 %08x\n", esr,
+      elr, spsr, far);
   // no return from exception for now
   while (1)
     ;
