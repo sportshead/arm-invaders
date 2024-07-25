@@ -1,5 +1,5 @@
-#include "gpio.h"
-#include "mbox.h"
+#include "hardware/gpio.h"
+#include "hardware/mbox.h"
 #include "sprintf.h"
 
 /* PL011 UART registers */

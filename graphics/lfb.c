@@ -1,7 +1,7 @@
-#include "delays.h"
-#include "font.h"
-#include "mbox.h"
-#include "uart.h"
+#include "graphics/font.h"
+#include "hardware/delays.h"
+#include "hardware/mbox.h"
+#include "hardware/uart.h"
 
 unsigned int width, height, pitch, isrgb; /* dimensions and channel order */
 unsigned char *lfb;                       /* raw frame buffer address */

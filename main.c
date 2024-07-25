@@ -1,5 +1,5 @@
-#include "lfb.h"
-#include "uart.h"
+#include "graphics/lfb.h"
+#include "hardware/uart.h"
 
 void main() {
   // set up serial console

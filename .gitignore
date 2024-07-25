@@ -52,3 +52,6 @@ Mkfile.old
 dkms.conf
 
 *.img
+
+compile_commands.json
+.cache
