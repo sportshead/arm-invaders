@@ -6,12 +6,6 @@
 unsigned int width, height, pitch, isrgb; /* dimensions and channel order */
 unsigned char *lfb;                       /* raw frame buffer address */
 
-#define HEIGHT 480
-#define WIDTH 320
-
-/**
- * Set screen resolution to 1024x768
- */
 void lfb_init() {
   /* newer qemu segfaults if we don't wait here a bit */
   wait_msec(100000);
@@ -22,14 +16,14 @@ void lfb_init() {
   mbox[2] = 0x48003; // set phy wh
   mbox[3] = 8;
   mbox[4] = 8;
-  mbox[5] = WIDTH;  // FrameBufferInfo.width
-  mbox[6] = HEIGHT; // FrameBufferInfo.height
+  mbox[5] = 320; // FrameBufferInfo.width
+  mbox[6] = 480; // FrameBufferInfo.height
 
   mbox[7] = 0x48004; // set virt wh
   mbox[8] = 8;
   mbox[9] = 8;
-  mbox[10] = WIDTH;  // FrameBufferInfo.virtual_width
-  mbox[11] = HEIGHT; // FrameBufferInfo.virtual_height
+  mbox[10] = 224; // FrameBufferInfo.virtual_width
+  mbox[11] = 256; // FrameBufferInfo.virtual_height
 
   mbox[12] = 0x48009; // set virt offset
   mbox[13] = 8;
@@ -70,7 +64,24 @@ void lfb_init() {
     isrgb = mbox[24];       // get the actual channel order
     lfb = (void *)((unsigned long)mbox[28]);
   } else {
-    uart_puts("Unable to set screen resolution to 1024x768x32\n");
+    uart_puts("Unable to set screen resolution\n");
+  }
+
+  mbox[0] = 7 * 4;
+  mbox[1] = MBOX_REQUEST;
+
+  mbox[2] = 0x48009; // set virutal offset
+  mbox[3] = 8;
+  mbox[3] = 8;
+  mbox[4] = 17; // x
+  mbox[5] = 10; // y
+
+  mbox[6] = MBOX_TAG_LAST;
+
+  if (mbox_call(MBOX_CH_PROP)) {
+    uart_printf("Set virtual offset to (%d,%d)\n", mbox[4], mbox[5]);
+  } else {
+    uart_puts("Unable to set virtual offset\n");
   }
 }
 
