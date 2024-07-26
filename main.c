@@ -12,5 +12,7 @@ void main() {
   // echo everything back
   while (1) {
     uart_send(uart_getc());
+    state.score_p1 += 10;
+    update_state();
   }
 }

@@ -1,3 +1,5 @@
+#include "bool.h"
+
 typedef enum {
   NO_PLAYER = 0,
   P1 = 1,
@@ -6,9 +8,12 @@ typedef enum {
 
 typedef struct {
   Player player;
+  bool two_players;
+
   int score_p1;
   int score_p2;
   int high_score;
+
   int lives;
   int credits;
 } State;
