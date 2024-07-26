@@ -1,4 +1,4 @@
-static char font_chars[42][8] = {
+static char font_chars[43][8] = {
     {
         0b00000000,
         0b00010000,
@@ -419,4 +419,14 @@ static char font_chars[42][8] = {
         0b00000000,
         0b00000000,
     }, // -
+    {
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    }, // <space>
 };

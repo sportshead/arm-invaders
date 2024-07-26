@@ -110,12 +110,14 @@ void lfb_print(const int X, const int Y, char *s, const unsigned int color) {
       glyph = &font_chars[40];
     } else if (*s == '-') {
       glyph = &font_chars[41];
+    } else if (*s == ' ') {
+      glyph = &font_chars[42];
     } else if (*s == '\r') {
       x = -8;
     } else if (*s == '\n') {
       x = -8;
       y += 8;
-    } else if (*s != ' ') {
+    } else {
       uart_printf("Unknown character: %c (0x%02x)\n", *s, *s);
       // ignore error, keep going
     }
