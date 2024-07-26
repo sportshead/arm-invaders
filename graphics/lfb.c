@@ -107,9 +107,9 @@ void lfb_print(const int X, const int Y, char *s, const unsigned int color) {
     } else if (*s >= '<' && *s <= '?') {
       glyph = &font_chars[*s - '<' + 36];
     } else if (*s == '*') {
-      glyph = &font_chars[41];
+      glyph = &font_chars[40];
     } else if (*s == '-') {
-      glyph = &font_chars[42];
+      glyph = &font_chars[41];
     } else if (*s == '\r') {
       x = -8;
     } else if (*s == '\n') {
