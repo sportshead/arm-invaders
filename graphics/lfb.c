@@ -16,8 +16,8 @@ void lfb_init() {
   mbox[2] = 0x48003; // set phy wh
   mbox[3] = 8;
   mbox[4] = 8;
-  mbox[5] = 320; // FrameBufferInfo.width
-  mbox[6] = 480; // FrameBufferInfo.height
+  mbox[5] = 224; // FrameBufferInfo.width
+  mbox[6] = 256; // FrameBufferInfo.height
 
   mbox[7] = 0x48004; // set virt wh
   mbox[8] = 8;
@@ -65,23 +65,6 @@ void lfb_init() {
     lfb = (void *)((unsigned long)mbox[28]);
   } else {
     uart_puts("Unable to set screen resolution\n");
-  }
-
-  mbox[0] = 7 * 4;
-  mbox[1] = MBOX_REQUEST;
-
-  mbox[2] = 0x48009; // set virutal offset
-  mbox[3] = 8;
-  mbox[3] = 8;
-  mbox[4] = 17; // x
-  mbox[5] = 10; // y
-
-  mbox[6] = MBOX_TAG_LAST;
-
-  if (mbox_call(MBOX_CH_PROP)) {
-    uart_printf("Set virtual offset to (%d,%d)\n", mbox[4], mbox[5]);
-  } else {
-    uart_puts("Unable to set virtual offset\n");
   }
 }
 
