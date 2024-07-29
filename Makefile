@@ -21,7 +21,7 @@ clean:
 
 .PHONY: run
 run: kernel8.img
-	qemu-system-aarch64 -M raspi3b -kernel kernel8.img -serial stdio -display cocoa,zoom-to-fit=on
+	qemu-system-aarch64 -M raspi3b -kernel kernel8.img -serial null -serial stdio -display cocoa,zoom-to-fit=on
 
 .PHONY: install
 install: kernel8.img
