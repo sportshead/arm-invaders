@@ -3,8 +3,17 @@
 #include "hardware/mbox.h"
 #include "hardware/uart.h"
 
-unsigned int width, height, pitch, isrgb; /* dimensions and channel order */
-unsigned char *lfb;                       /* raw frame buffer address */
+unsigned int pitch, isrgb; /* dimensions and channel order */
+unsigned char *lfb;        /* raw frame buffer address */
+
+#define WIDTH 224
+#define HEIGHT 256
+
+#define REAL_WIDTH 480
+#define REAL_HEIGHT 320
+
+#define X_OFFSET (REAL_WIDTH - WIDTH) / 2
+#define Y_OFFSET (REAL_HEIGHT - HEIGHT) / 2
 
 void lfb_init() {
   /* newer qemu segfaults if we don't wait here a bit */
@@ -16,14 +25,14 @@ void lfb_init() {
   mbox[2] = 0x48003; // set phy wh
   mbox[3] = 8;
   mbox[4] = 8;
-  mbox[5] = 224; // FrameBufferInfo.width
-  mbox[6] = 256; // FrameBufferInfo.height
+  mbox[5] = REAL_WIDTH;  // FrameBufferInfo.width
+  mbox[6] = REAL_HEIGHT; // FrameBufferInfo.height
 
   mbox[7] = 0x48004; // set virt wh
   mbox[8] = 8;
   mbox[9] = 8;
-  mbox[10] = 224; // FrameBufferInfo.virtual_width
-  mbox[11] = 256; // FrameBufferInfo.virtual_height
+  mbox[10] = REAL_WIDTH;  // FrameBufferInfo.virtual_width
+  mbox[11] = REAL_HEIGHT; // FrameBufferInfo.virtual_height
 
   mbox[12] = 0x48009; // set virt offset
   mbox[13] = 8;
@@ -39,7 +48,7 @@ void lfb_init() {
   mbox[21] = 0x48006; // set pixel order
   mbox[22] = 4;
   mbox[23] = 4;
-  mbox[24] = 1; // RGB, not BGR preferably
+  mbox[24] = 0; // RGB, not BGR preferably
 
   mbox[25] = 0x40001; // get framebuffer, gets alignment on request
   mbox[26] = 8;
@@ -58,22 +67,34 @@ void lfb_init() {
   // the closest supported resolution instead
   if (mbox_call(MBOX_CH_PROP) && mbox[20] == 32 && mbox[28] != 0) {
     mbox[28] &= 0x3FFFFFFF; // convert GPU address to ARM address
-    width = mbox[5];        // get actual physical width
-    height = mbox[6];       // get actual physical height
     pitch = mbox[33];       // get number of bytes per line
     isrgb = mbox[24];       // get the actual channel order
     lfb = (void *)((unsigned long)mbox[28]);
+    uart_printf("Framebuffer: %dx%d, pitch: %d, rgb: %d, ptr: 0x%08x\n",
+                mbox[5], mbox[6], pitch, isrgb, lfb);
   } else {
     uart_puts("Unable to set screen resolution\n");
+  }
+
+  for (int y = 0; y < REAL_HEIGHT; y++) {
+    int offset = y * pitch;
+    unsigned int color = (0xFF) << ((y % 3) * 8);
+    for (int x = 0; x < REAL_WIDTH; x++) {
+      *((unsigned int *)(lfb + offset)) = color;
+      offset += 4;
+    }
   }
 }
 
 #define BACKGROUND_COLOR 0x0
 void draw_glyph(int x, int y, char (*glyph)[8], const unsigned int color) {
+  uart_printf("Drawing glyph at (%d, %d) with color 0x%06x\n", x, y, color);
   int i, j;
   for (i = 0; i < 8; i++) {
-    int offset = (y + i) * pitch + (x * 4) + 4;
+    int offset = ((y + i + Y_OFFSET) * pitch) + ((x + X_OFFSET) * 4);
     for (j = 0; j < 8; j++) {
+      uart_printf("Drawing pixel (%d, %d) at offset 0x%08x + 0x%08x = 0x%08x\n",
+                  i, j, lfb, offset, lfb + offset);
       if ((*glyph)[i] & (0b10000000 >> j)) {
         *((unsigned int *)(lfb + offset)) = color;
       } else {
@@ -88,13 +109,14 @@ void draw_glyph(int x, int y, char (*glyph)[8], const unsigned int color) {
  * Display a string using the embedded bitmap font
  */
 void lfb_print(const int X, const int Y, char *s, const unsigned int color) {
-  int x, y = 0;
+  unsigned int x = 0;
+  unsigned int y = 0;
   while (*s) {
-    if (y + Y >= height) {
+    uart_printf("(X,Y) = (%d,%d)\n", X, Y);
+    uart_printf("(x,y) = (%d,%d)\n", x, y);
+    if (y + Y >= HEIGHT) {
       uart_printf("Ran out of space! Last char printed was %c at 0x%16x\n", *s,
                   s);
-      uart_printf("(X,Y) = (%d,%d)\n", X, Y);
-      uart_printf("(x,y) = (%d,%d)\n", x, y);
 
       return;
     }
@@ -127,7 +149,7 @@ void lfb_print(const int X, const int Y, char *s, const unsigned int color) {
 
     x += 8;
 
-    if (x + X >= width) {
+    if (x + X >= WIDTH) {
       x = 0;
       y += 8;
     }
