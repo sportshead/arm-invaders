@@ -17,7 +17,7 @@ kernel8.img: start.o $(OBJS)
 
 .PHONY: clean
 clean:
-	rm kernel8.elf **/*.o >/dev/null 2>/dev/null || true
+	rm kernel8.elf *.o **/*.o >/dev/null 2>/dev/null || true
 
 .PHONY: run
 run: kernel8.img
