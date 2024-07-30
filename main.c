@@ -12,13 +12,12 @@ void main() {
 
   lfb_init();
 
-  lfb_print(0, 0, "RED", 0xFF0000);
-  // init_state();
+  init_state();
 
   // echo everything back
   while (1) {
     uart_send(uart_getc());
     state.score_p1 += 10;
-    // update_state();
+    update_state();
   }
 }

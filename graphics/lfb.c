@@ -75,26 +75,17 @@ void lfb_init() {
   } else {
     uart_puts("Unable to set screen resolution\n");
   }
-
-  for (int y = 0; y < REAL_HEIGHT; y++) {
-    int offset = y * pitch;
-    unsigned int color = (0xFF) << ((y % 3) * 8);
-    for (int x = 0; x < REAL_WIDTH; x++) {
-      *((unsigned int *)(lfb + offset)) = color;
-      offset += 4;
-    }
-  }
 }
 
 #define BACKGROUND_COLOR 0x0
 void draw_glyph(int x, int y, char (*glyph)[8], const unsigned int color) {
-  uart_printf("Drawing glyph at (%d, %d) with color 0x%06x\n", x, y, color);
+  // uart_printf("Drawing glyph at (%d, %d) with color 0x%06x\n", x, y, color);
   int i, j;
   for (i = 0; i < 8; i++) {
     int offset = ((y + i + Y_OFFSET) * pitch) + ((x + X_OFFSET) * 4);
     for (j = 0; j < 8; j++) {
-      uart_printf("Drawing pixel (%d, %d) at offset 0x%08x + 0x%08x = 0x%08x\n",
-                  i, j, lfb, offset, lfb + offset);
+      // uart_printf("Drawing pixel (%d, %d) at offset 0x%08x + 0x%08x =
+      // 0x%08x\n", i, j, lfb, offset, lfb + offset);
       if ((*glyph)[i] & (0b10000000 >> j)) {
         *((unsigned int *)(lfb + offset)) = color;
       } else {
@@ -112,12 +103,11 @@ void lfb_print(const int X, const int Y, char *s, const unsigned int color) {
   unsigned int x = 0;
   unsigned int y = 0;
   while (*s) {
-    uart_printf("(X,Y) = (%d,%d)\n", X, Y);
-    uart_printf("(x,y) = (%d,%d)\n", x, y);
     if (y + Y >= HEIGHT) {
       uart_printf("Ran out of space! Last char printed was %c at 0x%16x\n", *s,
                   s);
-
+      uart_printf("(X,Y) = (%d,%d)\n", X, Y);
+      uart_printf("(x,y) = (%d,%d)\n", x, y);
       return;
     }
 
