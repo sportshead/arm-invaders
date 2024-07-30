@@ -1,3 +1,10 @@
+#include "graphics/lfb.h"
+
+#define __SPRITE(NAME, WIDTH, HEIGHT)                                          \
+  static inline void draw_##NAME(int x, int y, unsigned int color) {           \
+    lfb_sprite(x, y, WIDTH, HEIGHT, (char *)s_##NAME, color);                  \
+  }
+
 static char s_shield[16][3] = {
     {0b00000111, 0b11111111, 0b11100000}, //
     {0b00001111, 0b11111111, 0b11110000}, //
@@ -16,6 +23,7 @@ static char s_shield[16][3] = {
     {0b01111100, 0b00000000, 0b01111110}, //
     {0b01111100, 0b00000000, 0b01111110}, //
 };
+__SPRITE(shield, 3, 16);
 
 static char s_cannon[8][2] = {
     {0b00000000, 0b10000000}, //
@@ -27,6 +35,7 @@ static char s_cannon[8][2] = {
     {0b00111111, 0b11111110}, //
     {0b00111111, 0b11111110}, //
 };
+__SPRITE(cannon, 2, 8);
 
 static char s_invader_s1[8][2] = {
     {0b00000001, 0b10000000}, //
@@ -38,6 +47,7 @@ static char s_invader_s1[8][2] = {
     {0b00000101, 0b10100000}, //
     {0b00001010, 0b01010000}, //
 };
+__SPRITE(invader_s1, 2, 8);
 
 static char s_invader_s2[8][2] = {
     {0b00000001, 0b10000000}, //
@@ -49,6 +59,7 @@ static char s_invader_s2[8][2] = {
     {0b00001000, 0b00010000}, //
     {0b00000100, 0b00100000}, //
 };
+__SPRITE(invader_s2, 2, 8);
 
 static char s_invader_m1[8][2] = {
     {0b00000100, 0b00010000}, //
@@ -60,6 +71,7 @@ static char s_invader_m1[8][2] = {
     {0b00000100, 0b00010000}, //
     {0b00001000, 0b00001000}, //
 };
+__SPRITE(invader_m1, 2, 8);
 
 static char s_invader_m2[8][2] = {
     {0b00000100, 0b00010000}, //
@@ -71,6 +83,7 @@ static char s_invader_m2[8][2] = {
     {0b00010100, 0b00010100}, //
     {0b00000011, 0b01100000}, //
 };
+__SPRITE(invader_m2, 2, 8);
 
 static char s_invader_l1[8][2] = {
     {0b00000011, 0b11000000}, //
@@ -82,6 +95,7 @@ static char s_invader_l1[8][2] = {
     {0b00001101, 0b10110000}, //
     {0b00110000, 0b00001100}, //
 };
+__SPRITE(invader_l1, 2, 8);
 
 static char s_invader_l2[8][2] = {
     {0b00000011, 0b11000000}, //
@@ -93,6 +107,7 @@ static char s_invader_l2[8][2] = {
     {0b00011001, 0b10011000}, //
     {0b00001100, 0b00110000}, //
 };
+__SPRITE(invader_l2, 2, 8);
 
 static char s_invader_explosion[8][2] = {
     {0b00000100, 0b01000000}, //
@@ -104,3 +119,4 @@ static char s_invader_explosion[8][2] = {
     {0b00010010, 0b10010000}, //
     {0b00100101, 0b01001000}, //
 };
+__SPRITE(invader_explosion, 2, 8);

@@ -16,12 +16,12 @@ void format_number(int n) {
 
 void update_state() {
   format_number(state.score_p1);
-  lfb_print(8 * 3, 16, number, 0xFFFFFF);
+  lfb_print(8 * 3, 20, number, 0xFFFFFF);
 
   format_number(state.high_score);
   // this would be centred properly if it was 8 * 12
   // but the original is off centre /shrug
-  lfb_print(8 * 11, 16, number, 0xFFFFFF);
+  lfb_print(8 * 11, 20, number, 0xFFFFFF);
 
   if (state.two_players) {
     format_number(state.score_p2);
@@ -31,7 +31,7 @@ void update_state() {
     number[2] = ' ';
     number[3] = ' ';
   }
-  lfb_print(8 * 21, 16, number, 0xFFFFFF);
+  lfb_print(8 * 21, 20, number, 0xFFFFFF);
 
   format_number(state.credits);
   lfb_print(8 * 23, 256 - 8 - 4, &number[2], 0xFFFFFF); // credit is two digit

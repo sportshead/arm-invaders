@@ -1,3 +1,4 @@
+#include "graphics/lfb.h"
 #include "graphics/font.h"
 #include "hardware/delays.h"
 #include "hardware/mbox.h"
@@ -5,15 +6,6 @@
 
 unsigned int pitch, isrgb; /* dimensions and channel order */
 unsigned char *lfb;        /* raw frame buffer address */
-
-#define WIDTH 224
-#define HEIGHT 256
-
-#define REAL_WIDTH 480
-#define REAL_HEIGHT 320
-
-#define X_OFFSET (REAL_WIDTH - WIDTH) / 2
-#define Y_OFFSET (REAL_HEIGHT - HEIGHT) / 2
 
 void lfb_init() {
   /* newer qemu segfaults if we don't wait here a bit */
@@ -80,22 +72,22 @@ void lfb_init() {
 #define BACKGROUND_COLOR 0x0
 void lfb_sprite(const int x, const int y, const int w, const int h,
                 char *sprite, const unsigned int color) {
-  const int rows = (w / 8) * h;
+  uart_printf("lfb_sprite(%d,%d,%d,%d,0x%08x,0x%08x)\n", x, y, w, h, sprite,
+              color);
 
-  int i, j;
-  for (j = 0; j < rows; j++) {
+  int idx = 0;
+  for (int j = 0; j < h; j++) {
     int offset = ((y + j + Y_OFFSET) * pitch) + ((x + X_OFFSET) * 4);
-    int byte = -1;
-    for (i = 0; i < w; i++) {
-      if (i % 8 == 0) {
-        byte++;
+    for (int i = 0; i < w; i++) {
+      for (int bit = 0; bit < 8; bit++) {
+        if (sprite[idx] & (0b10000000 >> bit)) {
+          *((unsigned int *)(lfb + offset)) = color;
+        } else {
+          *((unsigned int *)(lfb + offset)) = BACKGROUND_COLOR;
+        }
+        offset += 4;
       }
-      if (sprite[j + byte] & (0b10000000 >> (i % 8))) {
-        *((unsigned int *)(lfb + offset)) = color;
-      } else {
-        *((unsigned int *)(lfb + offset)) = BACKGROUND_COLOR;
-      }
-      offset += 4;
+      idx++;
     }
   }
 }

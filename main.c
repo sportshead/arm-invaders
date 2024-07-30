@@ -1,5 +1,6 @@
 #include "game/state.h"
 #include "graphics/lfb.h"
+#include "graphics/sprites.h"
 #include "hardware/uart.h"
 
 void main() {
@@ -14,6 +15,11 @@ void main() {
   lfb_init();
 
   init_state();
+
+  draw_shield(3 * 8, 12 * 16, 0x00FF00);
+  draw_shield(9 * 8, 12 * 16, 0x00FF00);
+  draw_shield(15 * 8, 12 * 16, 0x00FF00);
+  draw_shield(21 * 8, 12 * 16, 0x00FF00);
 
   // echo everything back
   while (1) {
