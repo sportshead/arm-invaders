@@ -6,6 +6,7 @@ void main() {
   // set up serial console
   uart_init();
   uart_puts("\n\n");
+  uart_puts("\x1b]1337;SetMark\x07"); // iterm marker
   uart_puts("------------------------\n");
   uart_puts("      ARM-INVADERS      \n");
   uart_puts("------------------------\n");
