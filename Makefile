@@ -24,6 +24,7 @@ run: kernel8.img
 	qemu-system-aarch64 -M raspi3b -kernel kernel8.img -serial null -serial stdio -display cocoa,zoom-to-fit=on
 
 .PHONY: install
-install: kernel8.img
+install: kernel8.img config.txt
 	@test -d "$(PREFIX)" || (echo "PREFIX is not set or not a directory" && exit 1)
 	cp kernel8.img $(PREFIX)/kernel8.img
+	cp config.txt $(PREFIX)/config.txt

@@ -1,0 +1,17 @@
+max_usb_current=1
+
+# hdmi_safe=1
+hdmi_force_hotplug=1
+config_hdmi_boost=10
+hdmi_group=2
+hdmi_mode=87
+hdmi_cvt=480 320 60 6 0 0 0
+# 0: normal, 1: 90, 2: 180, 3: 270
+#display_rotate=0
+
+disable_overscan=1
+
+enable_uart=1
+# uart_2ndstage=1
+
+gpio=2-7=ip,pu # input, pull up

@@ -1,9 +1,13 @@
 #include "game/state.h"
 #include "graphics/lfb.h"
 #include "graphics/sprites.h"
+#include "hardware/delays.h"
+#include "hardware/gpio.h"
 #include "hardware/uart.h"
 
 void main() {
+  gpio_init();
+
   // set up serial console
   uart_init();
   uart_puts("\n\n");
@@ -23,8 +27,10 @@ void main() {
 
   // echo everything back
   while (1) {
-    uart_send(uart_getc());
-    state.score_p1 += 10;
+    // uart_send(uart_getc());
+    gpio_tick();
     update_state();
+
+    wait_msec(10000);
   }
 }
