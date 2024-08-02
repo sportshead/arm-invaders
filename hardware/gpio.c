@@ -63,8 +63,34 @@ void gpio_init() {
 }
 
 void gpio_tick() {
+  if ((*GPEDS0 >> P1_PIN) & 1) {
+    // TODO
+    *GPEDS0 = 1 << P1_PIN;
+  }
+
+  if ((*GPEDS0 >> P2_PIN) & 1) {
+    // TODO
+    *GPEDS0 = 1 << P2_PIN;
+  }
+
+  if ((*GPEDS0 >> FIRE_PIN) & 1) {
+    // TODO
+    *GPEDS0 = 1 << FIRE_PIN;
+  }
+
+  if ((*GPEDS0 >> LEFT_PIN) & 1) {
+    // TODO
+    *GPEDS0 = 1 << LEFT_PIN;
+  }
+
+  if ((*GPEDS0 >> RIGHT_PIN) & 1) {
+    // TODO
+    *GPEDS0 = 1 << RIGHT_PIN;
+  }
+
   if ((*GPEDS0 >> CREDIT_PIN) & 1) {
-    uart_puts("Credit button pushed\n");
     state.credits++;
+
+    *GPEDS0 = 1 << CREDIT_PIN; // clear
   }
 }
